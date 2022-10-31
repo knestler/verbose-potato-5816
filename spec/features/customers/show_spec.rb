@@ -4,18 +4,13 @@ RSpec.describe Customer, type: :feature do
   describe 'customer show page' do
     it 'has customer name' do  
       smash = Customer.create!(name: "Ashley")
-      powersurg = Customer.create!(name: "Sergio")
 
       visit "/customers/#{smash.id}"
       expect(page).to have_content(smash.name)
-      
-      visit "/customers/#{powersurg.id}"
-      expect(page).to have_content(powersurg.name)
+
     end 
 
     it 'has a list of its items and their attributes(name, price supermarket)' do 
-      smash = Customer.create!(name: "Ashley")
-      powersurg = Customer.create!(name: "Sergio")
       kev = Customer.create!(name: "Kevin")
       alex = Customer.create!(name: "Alex")
       
@@ -23,10 +18,9 @@ RSpec.describe Customer, type: :feature do
       weg = Supermarket.create!(name:"Wegmans" , location: "West Harrison", id: 2)
       
       waffles = Item.create!(name: "Waffles", price: 6, supermarket_id: 1)
-      beer = Item.create!(name: "Beer", price: 22, supermarket_id: 1)
-      apples = Item.create!(name: "Apples", price: 3, supermarket_id: 2)
+      beer = Item.create!(name: "Beer", price: 22, supermarket_id: 2)
+      apples = Item.create!(name: "Apples", price: 3, supermarket_id: 1)
       coffee = Item.create!(name: "Coffee" , price: 16, supermarket_id: 2)
-
 
       CustomerItem.create!(customer: alex, item: beer)
       CustomerItem.create!(customer: alex, item: coffee)
@@ -36,13 +30,28 @@ RSpec.describe Customer, type: :feature do
 
       visit "/customers/#{alex.id}"
 
-      expect(page).to have_content(alex.items)
-      expect(page).to have_content(alex.supermarket)
+      within "#{beer.id}" do
+        expect(page).to have_content("Beer")
+        expect(page).to have_content("Wegmans")
+      end 
 
+      within "#{coffee.id}" do
+        expect(page).to have_content("Coffee")
+        expect(page).to have_content("Wegmans")
+      end 
+      
       visit "/customers/#{kev.id}"
 
-      expect(page).to have_content(kev.items)
-      expect(page).to have_content(kev.supermarket)
+        within "#{waffles.id}" do
+        expect(page).to have_content("Waffles")
+        expect(page).to have_content("Whole Foods")
+      end 
+
+      within "#{apples.id}" do
+        expect(page).to have_content("Apples")
+        expect(page).to have_content("Whole Foods")
+      end 
+      
     end
   end
 end
